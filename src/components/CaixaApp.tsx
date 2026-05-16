@@ -60,8 +60,12 @@ export function CaixaApp({ cashierName }: { cashierName: string }) {
       body: JSON.stringify({ payment_method: payment }),
     });
     if (!res.ok) return;
-    const closed = normOrder(await res.json());
-    setLastClosed({ ...active, ...closed, payment, status: 'closed' });
+    const closed = await res.json();
+    setLastClosed({
+      ...active, payment, status: 'closed',
+      total: Number(closed.total),
+      commissionAmt: closed.commission_amt != null ? Number(closed.commission_amt) : null,
+    });
     await load();
     setScreen('confirm');
   };
