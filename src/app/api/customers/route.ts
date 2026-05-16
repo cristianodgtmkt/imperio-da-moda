@@ -27,13 +27,13 @@ export async function GET(req: NextRequest) {
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
   const rows = await query(
-    `SELECT c.*, cp.preferred_sizes, cp.preferred_categories, cp.preferred_colors, cp.notes,
+    `SELECT c.*, cp.preferred_sizes, cp.preferred_categories, cp.preferred_colors, cp.preferred_occasions, cp.notes,
             COALESCE(SUM(o.total) FILTER (WHERE o.status = 'closed'), 0) AS total_spent
      FROM customers c
      LEFT JOIN customer_profiles cp ON cp.customer_id = c.id
      LEFT JOIN orders o ON o.customer_id = c.id
      ${where}
-     GROUP BY c.id, cp.preferred_sizes, cp.preferred_categories, cp.preferred_colors, cp.notes
+     GROUP BY c.id, cp.preferred_sizes, cp.preferred_categories, cp.preferred_colors, cp.preferred_occasions, cp.notes
      ORDER BY c.name
      LIMIT $${i} OFFSET $${i + 1}`,
     [...params, pageSize, offset]

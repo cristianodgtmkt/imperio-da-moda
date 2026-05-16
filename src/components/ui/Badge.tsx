@@ -1,34 +1,35 @@
-import { T } from '@/lib/tokens';
+import { cn } from '@/lib/utils';
 
-type Variant = 'default' | 'accent' | 'success' | 'warning' | 'danger';
+type Variant = 'neutral' | 'default' | 'success' | 'warning' | 'danger' | 'accent';
 
 interface BadgeProps {
-  variant?: Variant;
-  size?: 'sm' | 'md';
   children: React.ReactNode;
+  variant?: Variant;
+  dot?: boolean;
+  size?: 'sm' | 'md';
+  className?: string;
 }
 
-const variantStyles: Record<Variant, React.CSSProperties> = {
-  default: { background: T.surface2, color: T.textMuted },
-  accent: { background: T.accentBg, color: T.accent },
-  success: { background: T.successBg, color: T.success },
-  warning: { background: T.warningBg, color: T.warning },
-  danger: { background: T.dangerBg, color: T.danger },
+const styles: Record<Variant, { bg: string; text: string; dot: string }> = {
+  neutral: { bg: 'bg-surface-2', text: 'text-textc-muted', dot: 'bg-textc-subtle' },
+  default: { bg: 'bg-surface-2', text: 'text-textc-muted', dot: 'bg-textc-subtle' },
+  success: { bg: 'bg-success-bg', text: 'text-[#15803D]', dot: 'bg-success' },
+  warning: { bg: 'bg-warning-bg', text: 'text-[#B45309]', dot: 'bg-warning' },
+  danger: { bg: 'bg-danger-bg', text: 'text-[#B91C1C]', dot: 'bg-danger' },
+  accent: { bg: 'bg-accent-bg', text: 'text-[#9D174D]', dot: 'bg-accent' },
 };
 
-export function Badge({ variant = 'default', size = 'md', children }: BadgeProps) {
+export function Badge({ children, variant = 'neutral', dot, size = 'md', className }: BadgeProps) {
+  const s = styles[variant];
   return (
     <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        borderRadius: 20,
-        fontWeight: 600,
-        fontSize: size === 'sm' ? 10 : 12,
-        padding: size === 'sm' ? '2px 6px' : '3px 8px',
-        ...variantStyles[variant],
-      }}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full font-semibold tracking-wider uppercase whitespace-nowrap',
+        size === 'sm' ? 'h-[22px] px-2 text-[11px]' : 'h-[26px] px-2.5 text-[12px]',
+        s.bg, s.text, className,
+      )}
     >
+      {dot && <span className={cn('h-1.5 w-1.5 rounded-full', s.dot)} />}
       {children}
     </span>
   );

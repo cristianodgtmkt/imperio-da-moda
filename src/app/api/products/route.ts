@@ -34,16 +34,16 @@ export async function GET(req: NextRequest) {
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
   const rows = await query(
-    `SELECT p.id, p.name, p.base_price, c.name AS category_name,
+    `SELECT p.id, p.name, p.base_price, p.active, c.id AS category_id, c.name AS category_name,
             json_agg(json_build_object(
               'id', v.id, 'size', v.size, 'color', v.color,
-              'price_override', v.price_override, 'stock_qty', v.stock_qty
+              'price_override', v.price_override, 'stock_qty', v.stock_qty, 'active', v.active
             ) ORDER BY v.size, v.color) FILTER (WHERE v.id IS NOT NULL AND v.active = true) AS variants
      FROM products p
      LEFT JOIN categories c ON c.id = p.category_id
      LEFT JOIN product_variants v ON v.product_id = p.id
      ${where}
-     GROUP BY p.id, p.name, p.base_price, c.name
+     GROUP BY p.id, p.name, p.base_price, p.active, c.id, c.name
      ORDER BY p.name
      LIMIT $${i} OFFSET $${i + 1}`,
     [...params, pageSize, offset]

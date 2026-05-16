@@ -1,25 +1,22 @@
 'use client';
-import { T } from '@/lib/tokens';
-import { HTMLAttributes } from 'react';
+import { cn } from '@/lib/utils';
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   hover?: boolean;
   padding?: number;
 }
 
-export function Card({ hover, padding = 16, style, children, ...props }: CardProps) {
+export function Card({ hover, padding = 16, className, style, children, ...rest }: CardProps) {
   return (
     <div
-      style={{
-        background: T.surface,
-        borderRadius: 16,
-        border: `1px solid ${T.border}`,
-        padding,
-        cursor: hover ? 'pointer' : undefined,
-        transition: hover ? 'box-shadow .15s' : undefined,
-        ...style,
-      }}
-      {...props}
+      className={cn(
+        'rounded-card border border-border bg-surface shadow-card',
+        'transition-[box-shadow,transform] duration-150',
+        hover && 'cursor-pointer hover:shadow-card-hover hover:-translate-y-px',
+        className,
+      )}
+      style={{ padding, ...style }}
+      {...rest}
     >
       {children}
     </div>
