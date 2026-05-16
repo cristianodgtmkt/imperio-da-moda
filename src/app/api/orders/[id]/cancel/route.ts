@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { query, queryOne, pool } from '@/lib/db';
+import { queryOne, pool } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +16,7 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
   );
   if (!order) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (order.status === 'cancelled') return NextResponse.json({ error: 'Already cancelled' }, { status: 409 });
+  if (order.status === 'closed') return NextResponse.json({ error: 'Cannot cancel a closed order' }, { status: 409 });
 
   const client = await pool.connect();
   try {
@@ -37,13 +38,14 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
       );
     }
 
-    const [cancelled] = await query(
+    // Order status update inside the same transaction
+    const cancelled = await client.query(
       `UPDATE orders SET status = 'cancelled', updated_at = now() WHERE id = $1 RETURNING *`,
       [params.id]
     );
 
     await client.query('COMMIT');
-    return NextResponse.json(cancelled);
+    return NextResponse.json(cancelled.rows[0]);
   } catch (err) {
     await client.query('ROLLBACK');
     return NextResponse.json({ error: 'Error cancelling order' }, { status: 500 });

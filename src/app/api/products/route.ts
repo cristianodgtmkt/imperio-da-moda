@@ -15,7 +15,8 @@ export async function GET(req: NextRequest) {
   const pageSize = parseInt(searchParams.get('pageSize') ?? '20');
   const offset = (page - 1) * pageSize;
 
-  const conditions: string[] = ['p.active = true'];
+  const includeInactive = searchParams.get('includeInactive') === 'true';
+  const conditions: string[] = includeInactive ? [] : ['p.active = true'];
   const params: unknown[] = [];
   let i = 1;
 

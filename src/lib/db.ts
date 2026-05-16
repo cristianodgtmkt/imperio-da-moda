@@ -6,14 +6,24 @@ declare global {
 }
 
 function createPool() {
-  return new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL?.includes('sslmode=require')
+  const raw = process.env.DATABASE_URL ?? '';
+
+  // Parse and strip sslmode from URL so pg doesn't reject unrecognised values
+  const [base, qs = ''] = raw.split('?');
+  const qsParts = qs.split('&').filter(Boolean);
+  const sslmodePart = qsParts.find((p) => p.startsWith('sslmode='));
+  const sslmode = sslmodePart?.split('=')[1] ?? 'disable';
+  const filteredQs = qsParts.filter((p) => !p.startsWith('sslmode=')).join('&');
+  const connectionString = filteredQs ? `${base}?${filteredQs}` : base;
+
+  const ssl =
+    sslmode === 'require' || sslmode === 'no-verify'
       ? { rejectUnauthorized: false }
-      : false,
-    max: 10,
-    idleTimeoutMillis: 30000,
-  });
+      : sslmode === 'verify-full' || sslmode === 'verify-ca'
+        ? { rejectUnauthorized: true }
+        : false;
+
+  return new Pool({ connectionString, ssl, max: 10, idleTimeoutMillis: 30000 });
 }
 
 const pool = globalThis._pgPool ?? createPool();

@@ -3,6 +3,7 @@ import { query } from '@/lib/db';
 import { fmtBRL } from '@/lib/format';
 import { T } from '@/lib/tokens';
 import { Card } from '@/components/ui/Card';
+import { TrendingUp, CheckSquare, Target, Award } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,10 +53,10 @@ export default async function DonoDashboard() {
   );
 
   const KPIS = [
-    { label: 'Faturamento', value: fmtBRL(Number(kpi.total_revenue)), color: T.primary, emoji: '💰' },
-    { label: 'Pedidos fechados', value: kpi.closed_orders, color: T.success, emoji: '✅' },
-    { label: 'Ticket médio', value: fmtBRL(Number(kpi.avg_ticket)), color: '#8B5CF6', emoji: '🎯' },
-    { label: 'Comissões', value: fmtBRL(Number(kpi.total_commissions)), color: T.accent, emoji: '🏆' },
+    { label: 'Faturamento', value: fmtBRL(Number(kpi.total_revenue)), color: T.primary, Icon: TrendingUp },
+    { label: 'Pedidos fechados', value: kpi.closed_orders, color: T.success, Icon: CheckSquare },
+    { label: 'Ticket médio', value: fmtBRL(Number(kpi.avg_ticket)), color: '#8B5CF6', Icon: Target },
+    { label: 'Comissões', value: fmtBRL(Number(kpi.total_commissions)), color: T.accent, Icon: Award },
   ];
 
   const currentMonth = today.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
@@ -71,8 +72,11 @@ export default async function DonoDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
         {KPIS.map((k) => (
           <Card key={k.label} style={{ padding: 20 }}>
-            <div style={{ fontSize: 22 }}>{k.emoji}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, marginTop: 8, color: k.color, letterSpacing: -0.4 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: k.color + '18',
+              display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <k.Icon size={18} color={k.color} strokeWidth={2} />
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 700, marginTop: 12, color: k.color, letterSpacing: -0.6 }}>
               {k.value}
             </div>
             <div style={{ fontSize: 13, color: T.textMuted, marginTop: 4 }}>{k.label}</div>
@@ -131,8 +135,8 @@ export default async function DonoDashboard() {
       {/* Open orders warning */}
       {Number(kpi.open_orders) > 0 && (
         <Card style={{ marginTop: 24, padding: 16, background: T.warningBg, border: `1px solid ${T.warning}` }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: T.warning }}>
-            ⚠️ {kpi.open_orders} pedido(s) em aberto aguardando o caixa
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#92400E' }}>
+            {kpi.open_orders} pedido(s) em aberto aguardando o caixa
           </div>
         </Card>
       )}

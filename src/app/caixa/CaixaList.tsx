@@ -7,7 +7,7 @@ import { OrderStatus } from '@/components/OrderStatus';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 import { fmtBRL, timeAgo } from '@/lib/format';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, CheckCircle } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -57,7 +57,7 @@ export function CaixaList() {
 
       {orders.length === 0 && (
         <Card style={{ padding: 60, textAlign: 'center' }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+          <CheckCircle size={48} color={T.success} style={{ margin: '0 auto 16px', display: 'block' }} />
           <div style={{ fontSize: 16, fontWeight: 600 }}>Nenhum pedido pendente</div>
           <div style={{ fontSize: 14, color: T.textMuted, marginTop: 4 }}>Quando uma vendedora enviar um pedido, ele aparece aqui.</div>
         </Card>
