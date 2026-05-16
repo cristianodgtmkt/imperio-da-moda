@@ -16,8 +16,9 @@ function createPool() {
   const filteredQs = qsParts.filter((p) => !p.startsWith('sslmode=')).join('&');
   const connectionString = filteredQs ? `${base}?${filteredQs}` : base;
 
+  // Only enable SSL when explicitly required; unknown values (e.g. "no-verify") → disable
   const ssl =
-    sslmode === 'require' || sslmode === 'no-verify'
+    sslmode === 'require'
       ? { rejectUnauthorized: false }
       : sslmode === 'verify-full' || sslmode === 'verify-ca'
         ? { rejectUnauthorized: true }
