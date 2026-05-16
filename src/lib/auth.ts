@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { queryOne } from './db';
+import { authConfig } from '@/auth.config';
 
 export type UserRole = 'vendedora' | 'caixa' | 'dono';
 
@@ -32,6 +33,7 @@ declare module 'next-auth' {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -60,22 +62,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.commissionPct = user.commissionPct;
-      }
-      return token;
-    },
-    session({ session, token }) {
-      session.user.id = token.id as string;
-      session.user.role = token.role as UserRole;
-      session.user.commissionPct = token.commissionPct as number;
-      return session;
-    },
-  },
-  pages: { signIn: '/login' },
-  session: { strategy: 'jwt' },
 });
